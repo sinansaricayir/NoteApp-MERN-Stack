@@ -12,6 +12,8 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 
 app.use('/api/notlar',require('./routes/notRoute'));
+app.use('/api/kullanicilar',require('./routes/kullaniciRoute'));
+
 
 app.use(hataYakalama);
 

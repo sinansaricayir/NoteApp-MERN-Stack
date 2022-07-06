@@ -1,26 +1,50 @@
 
 const asyncHandler = require('express-async-handler')
+const notModel = require('../models/notModel')
 
 const getNotlar = asyncHandler(async(req,res)=>{
-    res.status(200).json({mesaj:'controller get işlemi'})
+    const notlar = await notModel.find()
+    return res.status(200).json(notlar)
 })
 
 const setNotlar = asyncHandler(async (req,res)=>{
-    if(!req.body.mesaj){
-        // res.status(400).json({mesaj:'lütfen mesaj giriniz !'})
+    if(!req.body.baslik || !req.body.aciklama){
         res.status(400)
-        throw new Error('Lütfen mesaj giriniz !')
+        throw new Error('Lütfen başlık ve açıklama giriniz !')
     }
-    
-    res.status(200).json({mesaj:'controller set işlemi'})
+
+    const not = await notModel.create({
+        baslik:req.body.baslik,
+        aciklama:req.body.aciklama,
+        oncelik:req.body.oncelik
+    })
+
+    return res.status(200).json(not)
 })
 
 const updateNotlar = asyncHandler(async(req,res)=>{
-    res.status(200).json({mesaj:`${req.params.id} li put işlemi`})
+    // res.status(200).json({mesaj:`${req.params.id} li put işlemi`})
+    const not = await notModel.findById(req.params.id)
+    if(!not){
+        res.status(400)
+        throw new Error('Not bulunamadı !')
+    }
+
+    const guncellendi = await notModel.findByIdAndUpdate(req.params.id,req.body,{new:true})
+
+    res.status(200).json(guncellendi)
 })
 
 const deleteNotlar = asyncHandler(async(req,res)=>{
-    res.status(200).json({mesaj:`${req.params.id} li delete işlemi`})
+    // res.status(200).json({mesaj:`${req.params.id} li delete işlemi`})
+    const not = await notModel.findById(req.params.id)
+    if(!not){
+        res.status(400)
+        throw new Error('Not bulunamadı !')
+    }
+
+    await not.remove()
+    res.status(200).json({mesaj:'Not silindi...'})
 })
 
 module.exports={
