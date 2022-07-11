@@ -4,12 +4,14 @@ const router = express.Router()
 
 const {getNotlar,setNotlar,updateNotlar,deleteNotlar} = require('../controllers/notController')
 
+const {kullaniciKontrol} = require('../middlewares/authMiddleware')
+
 // router.get('/',getNotlar)
 // router.post('/',setNotlar)
 // router.put('/:id',updateNotlar)
 // router.delete('/:id',deleteNotlar)
 
-router.route('/').get(getNotlar).post(setNotlar);
-router.route('/:id').put(updateNotlar).delete(deleteNotlar);
+router.route('/').get(kullaniciKontrol,getNotlar).post(kullaniciKontrol,setNotlar);
+router.route('/:id').put(kullaniciKontrol,updateNotlar).delete(kullaniciKontrol,deleteNotlar);
 
 module.exports = router;

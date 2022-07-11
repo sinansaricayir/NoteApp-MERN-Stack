@@ -1,6 +1,16 @@
 const asyncHandler = require('express-async-handler')
 const Kullanici = require('../models/kullaniciModel')
 const bcyrpt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+
+const tokenOlustur = (id) =>{
+    return jwt.sign({id},process.env.JWT_SECRET,{
+        expiresIn:'30d'
+    })
+}
+
+
 
 const registerKullanici = asyncHandler(async (req,res)=>{
     const {kullaniciAd,email,parola} = req.body;
@@ -40,7 +50,8 @@ const registerKullanici = asyncHandler(async (req,res)=>{
         res.status(201).json({
             _id:yeniKullanici.id,
             kullaniciAd:yeniKullanici.kullaniciAd,
-            email:yeniKullanici.email
+            email:yeniKullanici.email,
+            token:tokenOlustur(yeniKullanici._id)
         })
     }else{
         res.status(400)
@@ -55,13 +66,37 @@ const registerKullanici = asyncHandler(async (req,res)=>{
 
 
 
-const loginKullanici = (req,res)=>{
-    res.status(200).json({mesaj:"Login işlemi tamamlandı !"})
-}
+const loginKullanici = asyncHandler(async (req,res)=>{
+    const{email,parola} = req.body;
+    const kullanici = await Kullanici.findOne({email})
+    if(kullanici && (await bcyrpt.compare(parola,kullanici.parola))){
+        res.json({
+            _id:kullanici.id,
+            kullaniciAd:kullanici.kullaniciAd,
+            email:kullanici.email,
+            token:tokenOlustur(kullanici._id)
+        })
+    }else{
+        res.status(400)
+        throw new Error('Geçersiz email yada parola !')
+    }
+})
 
-const getKullanici = (req,res)=>{
-    res.status(200).json({mesaj:"Kullanıcı get işlemleri"})
-}
+
+
+
+
+const getKullanici =asyncHandler(async (req,res)=>{
+    const{_id,kullaniciAd,email} = await Kullanici.findById(req.user.id)
+
+    res.status(200).json({
+        id:_id,
+        kullaniciAd,
+        email
+    })
+})
+
+
 
 
 

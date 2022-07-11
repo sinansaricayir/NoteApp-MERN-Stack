@@ -1,6 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
-const {hataYakalama} = require('./middlewares/errormiddleware');
+const {hataYakalama} = require('./middlewares/errorMiddleware');
 const baglan = require('./config/db')
 const colors = require('colors');
 const PORT = process.env.PORT
